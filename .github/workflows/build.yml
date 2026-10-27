@@ -1,0 +1,37 @@
+name: build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      XSE_FO4_MODS_PATH: ${{ github.workspace }}\mods
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch CommonLibF4
+        run: git clone --recurse-submodules --depth 1 https://github.com/libxse/commonlibf4.git extern/CommonLibF4
+
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      - name: Build
+        run: |
+          xmake f -y -m releasedbg
+          xmake build -y -v HardLevelCap
+
+      - name: Collect files
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist/Data/F4SE/Plugins | Out-Null
+          Get-ChildItem -Path build -Recurse -Include HardLevelCap.dll | Copy-Item -Destination dist/Data/F4SE/Plugins
+          Copy-Item HardLevelCap.ini dist/Data/F4SE/Plugins
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HardLevelCap
+          path: dist
