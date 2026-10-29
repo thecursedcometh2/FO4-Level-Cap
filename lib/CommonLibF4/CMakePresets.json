@@ -1,0 +1,182 @@
+{
+	"version": 11,
+	"cmakeMinimumRequired": {
+		"major": 4,
+		"minor": 3,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "common",
+			"hidden": true,
+			"errors": {
+				"deprecated": true
+			},
+			"warnings": {
+				"dev": true,
+				"systemVars": true,
+				"unusedCli": true
+			},
+			"cacheVariables": {
+				"CMAKE_SYSTEM_NAME": "Windows",
+				"CMAKE_SYSTEM_VERSION": "10.0.19045.0"
+			}
+		},
+		{
+			"name": "packaging-vcpkg",
+			"hidden": true,
+			"toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+		},
+		{
+			"name": "buildtype-debug",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"VCPKG_TARGET_TRIPLET": "x64-windows-static-md",
+				"VCPKG_HOST_TRIPLET": "x64-windows-static-md",
+				"CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDebugDLL"
+			}
+		},
+		{
+			"name": "buildtype-release",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
+				"VCPKG_TARGET_TRIPLET": "x64-windows-static-md-release",
+				"VCPKG_HOST_TRIPLET": "x64-windows-static-md-release",
+				"CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL"
+			}
+		},
+		{
+			"name": "architecture-x64",
+			"hidden": true,
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"toolset": {
+				"value": "host=x64",
+				"strategy": "external"
+			}
+		},
+		{
+			"name": "generator-msvc",
+			"hidden": true,
+			"inherits": "architecture-x64",
+			"generator": "Visual Studio 18 2026"
+		},
+		{
+			"name": "generator-ninja",
+			"hidden": true,
+			"inherits": "architecture-x64",
+			"generator": "Ninja"
+		},
+		{
+			"name": "compiler-msvc",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "OFF"
+			},
+			"vendor": {
+				"microsoft.com/VisualStudioSettings/CMake/1.0": {
+					"intelliSenseMode": "windows-msvc-x64",
+					"enableMicrosoftCodeAnalysis": true,
+					"enableClangTidyCodeAnalysis": false
+				}
+			}
+		},
+		{
+			"name": "compiler-clang",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": "clang-cl",
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			},
+			"vendor": {
+				"microsoft.com/VisualStudioSettings/CMake/1.0": {
+					"intelliSenseMode": "windows-clang-x64",
+					"enableMicrosoftCodeAnalysis": false,
+					"enableClangTidyCodeAnalysis": true
+				}
+			}
+		},
+		{
+			"name": "build-debug-msvc-msvc",
+			"hidden": false,
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-debug",
+				"generator-msvc",
+				"compiler-msvc"
+			],
+			"binaryDir": "${sourceDir}/build/debug-msvc-msvc"
+		},
+		{
+			"name": "build-release-msvc-msvc",
+			"hidden": false,
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-release",
+				"generator-msvc",
+				"compiler-msvc"
+			],
+			"binaryDir": "${sourceDir}/build/release-msvc-msvc"
+		},
+		{
+			"name": "build-debug-clang-ninja",
+			"hidden": false,
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-debug",
+				"generator-ninja",
+				"compiler-clang"
+			],
+			"binaryDir": "${sourceDir}/build/debug-clang-ninja"
+		},
+		{
+			"name": "build-release-clang-ninja",
+			"hidden": false,
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-release",
+				"generator-ninja",
+				"compiler-clang"
+			],
+			"binaryDir": "${sourceDir}/build/release-clang-ninja"
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "debug-msvc-msvc",
+			"hidden": false,
+			"configuration": "Debug",
+			"configurePreset": "build-debug-msvc-msvc",
+			"displayName": "1. (Debug) MSVC - MSVC"
+		},
+		{
+			"name": "release-msvc-msvc",
+			"hidden": false,
+			"configuration": "RelWithDebInfo",
+			"configurePreset": "build-release-msvc-msvc",
+			"displayName": "2. (Release) MSVC - MSVC"
+		},
+		{
+			"name": "debug-clang-ninja",
+			"hidden": false,
+			"configuration": "Debug",
+			"configurePreset": "build-debug-clang-ninja",
+			"displayName": "3. (Debug) Clang - Ninja"
+		},
+		{
+			"name": "release-clang-ninja",
+			"hidden": false,
+			"configuration": "RelWithDebInfo",
+			"configurePreset": "build-release-clang-ninja",
+			"displayName": "4. (Release) Clang - Ninja"
+		}
+	]
+}
